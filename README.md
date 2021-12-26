@@ -27,3 +27,4 @@ And I think that is kinda all.
 
 Once the "color_scheme" file is created, you can `source color_scheme` to use generated colors.
 
+Special characters used are from [FontAwesome](https://fontawesome.com/icons). If you don't have this font installed, you won't see the icons.
