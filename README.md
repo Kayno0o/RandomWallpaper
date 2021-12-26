@@ -8,4 +8,22 @@ My arch script for randomizing a wallpaper, generating its palette, and putting 
 
 And I think that is kinda all.
 
+# Running the script
+
+```
+./random_wallpaper.sh
+```
+
+```
+        Usage:
+            random_wallpaper.sh [OPTIONS]
+
+        Options:
+            -d DIRECTORY
+                Path to a directory with images. (~/Pictures by default)
+            -n  Use with Nitrogen
+            -o  Save color scheme to another file. (~/.config/color_scheme by default)
+```
+
 Once the "color_scheme" file is created, you can `source color_scheme` to use generated colors.
+
