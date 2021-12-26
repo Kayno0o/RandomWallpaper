@@ -1,45 +1,76 @@
 #!/bin/bash
 
-if [ $# -eq 0 ]; then
-    echo "Please, provide a path to a directory with images."
-    exit 1
-fi
+if [ $1 != "-h" ] && [ $1 != "--help" ]; then
+    IMAGES_FOLDER="~/Pictures"
+    for i in $(seq 1 $#)
+    do
+        if [ "${!i}" = "-d" ]; then
+            j=$((i+1))
+            IMAGES_FOLDER="${!j}"
+        fi
+    done
 
-FOLDER=$1
+    NITROGEN="false"
+    for param in "$@"
+    do
+        if [ "$param" = "-n" ]; then
+            NITROGEN="true"
+        fi
+    done
 
-echo "  Loading random wallpaper from $FOLDER..."
-WALLPAPER=$(find $FOLDER -type f | shuf -n 1)
-if [ $2 == "-n" ]; then
-    sed -i 's@file=.*@file='$WALLPAPER'@' ~/.config/nitrogen/bg-saved.cfg
-fi
+    SAVE_FOLDER="~/.config"
+    for i in $(seq 1 $#)
+    do
+        if [ "${!i}" = "-o" ]; then
+            j=$((i+1))
+            SAVE_FOLDER="${!j}"
+        fi
+    done
 
-echo "  Loading and generating color scheme..."
+    echo "  Loading random wallpaper from $IMAGES_FOLDER..."
+    WALLPAPER=$(find $IMAGES_FOLDER -type f | shuf -n 1)
+    if [ NITROGEN == "true" ]; then
+        sed -i 's@file=.*@file='$WALLPAPER'@' ~/.config/nitrogen/bg-saved.cfg
+    fi
 
-if [ $2 == "-n" ]; then
-    nitrogen --restore 2> /dev/null
-fi
+    echo "  Loading and generating color scheme..."
 
-if [ $2 == "-n" ]; then
-    wal -i $WALLPAPER -n 2> /dev/null
+    if [ NITROGEN == "true" ]; then
+        nitrogen --restore 2> /dev/null
+        wal -i $WALLPAPER -n 2> /dev/null
+    else
+        wal -i $WALLPAPER 2> /dev/null
+    fi
+
+    # GOOD_COLOR = 3rd line of ~/.cache/wal/colors
+    BACKGROUND_COLOR=$(sed -n '1p' ~/.cache/wal/colors)
+    TEXT_COLOR=$(sed -n '3p' ~/.cache/wal/colors)
+    GOOD_COLOR=$(sed -n '8p' ~/.cache/wal/colors)
+    WARNING_COLOR=$(sed -n '2p' ~/.cache/wal/colors)
+    ERROR_COLOR=$(sed -n '6p' ~/.cache/wal/colors)
+    FOCUS=$(sed -n '5p' ~/.cache/wal/colors)
+
+    echo "  Saving to $SAVE_FOLDER"
+
+    echo "
+    BACKGROUND_COLOR=$BACKGROUND_COLOR
+    TEXT_COLOR=$TEXT_COLOR
+    GOOD_COLOR=$GOOD_COLOR
+    WARNING_COLOR=$WARNING_COLOR
+    ERROR_COLOR=$ERROR_COLOR
+    FOCUS=$FOCUS
+    " > "$SAVE_FOLDER/color_scheme"
+
+    echo "  Done"
 else
-    wal -i $WALLPAPER 2> /dev/null
+    echo "
+    Usage:
+        random_wallpaper.sh [DIRECTORY] [OPTIONS]
+
+    Options:
+        -d DIRECTORY
+            Path to a directory with images.
+        -n  Use Nitrogen
+        -o  Save color scheme to another file
+    "
 fi
-
-# GOOD_COLOR = 3rd line of ~/.cache/wal/colors
-BACKGROUND_COLOR=$(sed -n '1p' ~/.cache/wal/colors)
-TEXT_COLOR=$(sed -n '3p' ~/.cache/wal/colors)
-GOOD_COLOR=$(sed -n '8p' ~/.cache/wal/colors)
-WARNING_COLOR=$(sed -n '2p' ~/.cache/wal/colors)
-ERROR_COLOR=$(sed -n '6p' ~/.cache/wal/colors)
-FOCUS=$(sed -n '5p' ~/.cache/wal/colors)
-
-echo "
-BACKGROUND_COLOR=$BACKGROUND_COLOR
-TEXT_COLOR=$TEXT_COLOR
-GOOD_COLOR=$GOOD_COLOR
-WARNING_COLOR=$WARNING_COLOR
-ERROR_COLOR=$ERROR_COLOR
-FOCUS=$FOCUS
-" > color_scheme
-
-echo "  Done"
