@@ -42,23 +42,15 @@ if [ $1 != "-h" ] && [ $1 != "--help" ]; then
         wal -i $WALLPAPER 2> /dev/null
     fi
 
-    # GOOD_COLOR = 3rd line of ~/.cache/wal/colors
+    echo "  Saving to $SAVE_FOLDER"
+
+    echo "
     BACKGROUND_COLOR=$(sed -n '1p' ~/.cache/wal/colors)
     TEXT_COLOR=$(sed -n '3p' ~/.cache/wal/colors)
     GOOD_COLOR=$(sed -n '8p' ~/.cache/wal/colors)
     WARNING_COLOR=$(sed -n '2p' ~/.cache/wal/colors)
     ERROR_COLOR=$(sed -n '6p' ~/.cache/wal/colors)
     FOCUS=$(sed -n '5p' ~/.cache/wal/colors)
-
-    echo "  Saving to $SAVE_FOLDER"
-
-    echo "
-    BACKGROUND_COLOR=$BACKGROUND_COLOR
-    TEXT_COLOR=$TEXT_COLOR
-    GOOD_COLOR=$GOOD_COLOR
-    WARNING_COLOR=$WARNING_COLOR
-    ERROR_COLOR=$ERROR_COLOR
-    FOCUS=$FOCUS
     " > "$SAVE_FOLDER/color_scheme"
 
     echo "  Done"
