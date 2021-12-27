@@ -1,41 +1,44 @@
 #!/bin/bash
 
 if [ $1 != "-h" ] && [ $1 != "--help" ]; then
+    NITROGEN="false"
     IMAGES_FOLDER="~/Pictures"
+    SAVE_FOLDER="~/.config"
+    WALLPAPER=""
     for i in $(seq 1 $#)
     do
         if [ "${!i}" = "-d" ]; then
             j=$((i+1))
             IMAGES_FOLDER="${!j}"
         fi
-    done
 
-    NITROGEN="false"
-    for param in "$@"
-    do
-        if [ "$param" = "-n" ]; then
-            NITROGEN="true"
-        fi
-    done
-
-    SAVE_FOLDER="~/.config"
-    for i in $(seq 1 $#)
-    do
         if [ "${!i}" = "-o" ]; then
             j=$((i+1))
             SAVE_FOLDER="${!j}"
         fi
+
+        if [ "${!i}" = "-i" ]; then
+            j=$((i+1))
+            WALLPAPER="${!j}"
+        fi
+
+        if [ "${!i}" = "-n" ]; then
+            NITROGEN="true"
+        fi
     done
 
-    echo "  Loading random wallpaper from $IMAGES_FOLDER..."
-    WALLPAPER=$(find $IMAGES_FOLDER -type f | shuf -n 1)
-    if [ NITROGEN == "true" ]; then
-        sed -i 's@file=.*@file='$WALLPAPER'@' ~/.config/nitrogen/bg-saved.cfg
+    if [ "$WALLPAPER" = "" ]; then
+        echo "  Loading random wallpaper from $IMAGES_FOLDER..."
+        WALLPAPER=$(find $IMAGES_FOLDER -type f -iname "*.jpg" -o -iname "*.png" | shuf -n 1)
+    else
+        echo "  Loading wallpaper $WALLPAPER..."
     fi
 
     echo "  Loading and generating color scheme..."
 
-    if [ NITROGEN == "true" ]; then
+    if [ $NITROGEN == "true" ]; then
+        sed -i 's@file=.*@file='$WALLPAPER'@' ~/.config/nitrogen/bg-saved.cfg
+
         nitrogen --restore 2> /dev/null
         wal -i $WALLPAPER -n 2> /dev/null
     else
